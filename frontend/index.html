@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Workshop - Temperature Forecast</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <style>
+      body {
+        background: #f4f4f8;
+      }
+
+      .container {
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+        border-radius: 5px;
+        margin-top: 150px;
+        margin-right: auto;
+        margin-bottom: 0;
+        margin-left: auto;
+
+        background: white;
+        width: 1024px;
+      }
+
+      .heading {
+        border-bottom: 1px solid #f4f4f8;
+        margin-bottom: 50px;
+      }
+
+      h1 {
+        font-family: "Segoe UI", Arial, sans-serif;
+        font-weight: 400;
+        margin-left: 25px;
+        padding-top: 10px;
+        margin-bottom: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="heading">
+        <h1>Temperature Forecast</h1>
+      </div>
+
+      <div id="graph"></div>
+    </div>
+
+    <script>
+      function parseDate(str) {
+        return new Date(str.slice(0, 4), str.slice(4, 6) - 1, str.slice(6, 8));
+      }
+
+      Promise.all([
+        axios.get("http://localhost:7001/data"),
+        axios.get("http://localhost:7001/predictions?days=7")
+      ]).then(([{ data: weather }, { data: predictions }]) => {
+        const x = weather.slice(-60).map(p => parseDate(p.date));
+        const y = weather.slice(-60).map(p => p.temperature);
+
+        const lastDate = x[x.length - 1];
+        predictions.forEach((temperature, i) => {
+          const date = new Date(lastDate);
+          date.setDate(date.getDate() + i);
+
+          x.push(date);
+          y.push(temperature);
+        });
+
+        const graph = document.getElementById("graph");
+        Plotly.plot(
+          graph,
+          [
+            {
+              x,
+              y
+            }
+          ],
+          {
+            margin: { t: 0 },
+            shapes: [
+              {
+                type: "line",
+                x0: x[59],
+                y0: 0,
+                x1: x[59],
+                y1: 20,
+                line: {
+                  color: "rgb(255, 0, 0)",
+                  width: 1,
+                  dash: "dot"
+                }
+              }
+            ]
+          }
+        );
+      });
+    </script>
+  </body>
+</html>

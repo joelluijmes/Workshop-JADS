@@ -1,0 +1,13 @@
+version: "3.7"
+services:
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - 7080:80
+
+  api:
+    build:
+      context: ./api
+    ports:
+      - 7001:7001

@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: workshop-api
+  labels:
+    app.kubernetes.io/name: workshop-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: workshop-api
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: workshop-api
+    spec:
+      containers:
+        - name: workshop-api
+          image: joelluijmes/workshop-api
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 7001
+              protocol: TCP
+          env:
+            - name: MONGODB
+              value: mongodb://mongodb:27017

@@ -1,0 +1,18 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: train-model-cron
+spec:
+  schedule: "5 4 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: train-model
+            image: alpine
+            args:
+            - /bin/sh
+            - -c
+            - apk add --no-cache curl && curl --request POST --url http://workshop-api:7001/train-model
+          restartPolicy: Never
